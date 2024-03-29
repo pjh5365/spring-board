@@ -3,6 +3,8 @@ package pjh5365.springboard.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import pjh5365.springboard.entity.Post;
@@ -28,8 +30,8 @@ public class PostService {
 		postRepository.save(post);
 	}
 
-	public List<Post> findAll() {
-		return postRepository.findAll();
+	public Page<Post> findAll(Pageable pageable) {
+		return postRepository.findAllByOrderByIdDesc(pageable);
 	}
 
 	public Post findById(Long id) {
