@@ -3,6 +3,9 @@ package pjh5365.springboard.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,10 +45,29 @@ public class PostController {
 	}
 
 	@GetMapping("/")
-	public String postList(Model model) {
-		List<Post> list = postService.findAll();
+	public String postList(Model model, @PageableDefault(size = 3) Pageable pageable) {
+		Page<Post> list = postService.findAll(pageable);
+		int startPage;
+		int endPage;
 
+		if (list.getTotalPages() < 5) {
+			startPage = 1;
+			endPage = list.getTotalPages();
+		} else if (pageable.getPageNumber() < 3) {
+			startPage = 1;
+			endPage = 5;
+		} else if(pageable.getPageNumber() >= list.getTotalPages() - 3) {   // 현재 페이지가 총 페이지 - 3 보다 크거나 같을 때는
+			startPage = list.getTotalPages() - 4;
+			endPage = list.getTotalPages();
+		}
+		else { // 나머지 경우
+			startPage = list.getPageable().getPageNumber() - 1;    // 4페이지 보일 때 원래 페이지는 3이므로 1을 빼서 2로 설정
+			endPage = list.getPageable().getPageNumber() + 3;   // 원래 페이지인 3에 3을 더해 6 로 설정 (2,3,4,5,6 까지 설정 가능)
+		}
 		model.addAttribute("list", list);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+
 		System.out.println(list);
 		return "index";
 	}
