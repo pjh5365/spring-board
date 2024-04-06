@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import pjh5365.springboard.dto.PostRequest;
 import pjh5365.springboard.entity.Post;
 import pjh5365.springboard.repository.PostRepository;
 
@@ -23,9 +24,13 @@ class PostServiceTest {
 
 	@Test
 	void 게시글_저장_테스트() {
-		Post post = new Post(1L, "제목", "내용");
-		postService.addPost(post);
+		PostRequest postRequest = new PostRequest( "제목", "내용");
+		postService.addPost(postRequest);
 
-		assertEquals(post, postRepository.findById(1L).get());
+		Post result = postRepository.findByTitle("제목");
+		assertAll(
+				() -> assertEquals(postRequest.getTitle(), result.getTitle()),
+				() -> assertEquals(postRequest.getContent(), result.getContent())
+		);
 	}
 }
