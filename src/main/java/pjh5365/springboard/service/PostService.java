@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import pjh5365.springboard.dto.PostRequest;
 import pjh5365.springboard.entity.Post;
 import pjh5365.springboard.repository.PostRepository;
 
@@ -26,7 +27,8 @@ public class PostService {
 		this.postRepository = postRepository;
 	}
 
-	public void addPost(Post post) {
+	public void addPost(PostRequest postRequest) {
+		Post post = new Post(postRequest.getTitle(), postRequest.getContent());
 		postRepository.save(post);
 	}
 
@@ -36,5 +38,14 @@ public class PostService {
 
 	public Post findById(Long id) {
 		return postRepository.findById(id).get();
+	}
+
+	public void update(Long postId, PostRequest postRequest) {
+		Post post = new Post(postId, postRequest.getTitle(), postRequest.getContent());
+		postRepository.save(post);
+	}
+
+	public void delete(Long postId) {
+		postRepository.deleteById(postId);
 	}
 }

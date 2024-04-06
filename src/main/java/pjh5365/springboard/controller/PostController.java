@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import pjh5365.springboard.dto.PostRequest;
 import pjh5365.springboard.entity.Post;
 import pjh5365.springboard.service.PostService;
 
@@ -38,15 +39,53 @@ public class PostController {
 	}
 
 	@PostMapping("/write")
-	public String addPost(Post post) {
-		postService.addPost(post);
-		System.out.println(post);
+	public String addPost(PostRequest postRequest) {
+		postService.addPost(postRequest);
+		// System.out.println(postRequest);
 		return "redirect:/";
 	}
 
 	@GetMapping("/")
 	public String postList(Model model, @PageableDefault(size = 3) Pageable pageable) {
 		Page<Post> list = postService.findAll(pageable);
+		paging(model, pageable, list);
+
+		System.out.println(list);
+		return "index";
+	}
+
+	@GetMapping("/posts/{id}")
+	public String getPost(@PathVariable Long id, Model model) {
+		Post post = postService.findById(id);
+		model.addAttribute("post", post);
+
+		return "postView";
+	}
+
+	@GetMapping("/posts/{id}/update")
+	public String getPostUpdate(@PathVariable Long id, Model model) {
+		Post post = postService.findById(id);
+		model.addAttribute("post", post);
+
+		return "updateForm";
+	}
+
+	@PostMapping("/posts/{id}/update")
+	public String postUpdate(@PathVariable Long id, PostRequest postRequest) {
+		postService.update(id, postRequest);
+		// model.addAttribute("post", post);
+
+		return "redirect:/posts/" + id;
+	}
+
+	@GetMapping("/posts/{id}/delete")
+	public String deletePost(@PathVariable Long id) {
+		postService.delete(id);
+
+		return "redirect:/";
+	}
+
+	private void paging(Model model, Pageable pageable, Page<Post> list) {
 		int startPage;
 		int endPage;
 
@@ -67,16 +106,5 @@ public class PostController {
 		model.addAttribute("list", list);
 		model.addAttribute("startPage", startPage);
 		model.addAttribute("endPage", endPage);
-
-		System.out.println(list);
-		return "index";
-	}
-
-	@GetMapping("/posts/{id}")
-	public String getPost(@PathVariable Long id, Model model) {
-		Post post = postService.findById(id);
-		model.addAttribute("post", post);
-
-		return "postView";
 	}
 }
