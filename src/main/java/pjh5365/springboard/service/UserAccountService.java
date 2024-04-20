@@ -3,6 +3,7 @@ package pjh5365.springboard.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import pjh5365.springboard.dto.UserAccountRequest;
@@ -17,14 +18,20 @@ import pjh5365.springboard.repository.UserAccountRepository;
 public class UserAccountService {
 
 	private final UserAccountRepository userAccountRepository;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
-	public UserAccountService(UserAccountRepository userAccountRepository) {
+	public UserAccountService(UserAccountRepository userAccountRepository,
+			BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userAccountRepository = userAccountRepository;
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	public void join(UserAccountRequest request) {
-		UserAccount user = UserAccount.builder().userId(request.getUserId()).password(request.getPassword()).build();
+		UserAccount user = UserAccount.builder()
+				.userId(request.getUserId())
+				.password(bCryptPasswordEncoder.encode(request.getPassword()))
+				.build();
 		userAccountRepository.save(user);
 	}
 
